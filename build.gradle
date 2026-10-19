@@ -1,0 +1,53 @@
+plugins {
+    id 'base'
+    id 'org.springframework.boot' version '4.1.1' apply false
+}
+
+ext {
+    mybatisSpringBootVersion = '4.0.0'
+    mybatisGeneratorVersion = '1.4.2'
+}
+
+allprojects {
+    group = 'com.example.demo'
+    version = '0.0.1-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    dependencies {
+        api platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        testAnnotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.release = 21
+        options.encoding = 'UTF-8'
+        options.compilerArgs.add('-parameters')
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+}

@@ -1,0 +1,32 @@
+configurations {
+    mybatisGenerator
+}
+
+dependencies {
+    api project(':core')
+    api project(':common')
+    api "org.mybatis.spring.boot:mybatis-spring-boot-starter:${rootProject.mybatisSpringBootVersion}"
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation "org.mybatis.spring.boot:mybatis-spring-boot-starter-test:${rootProject.mybatisSpringBootVersion}"
+
+    mybatisGenerator "org.mybatis.generator:mybatis-generator-core:${rootProject.mybatisGeneratorVersion}"
+    mybatisGenerator platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    mybatisGenerator 'com.mysql:mysql-connector-j'
+}
+
+tasks.register('mybatisGenerate', JavaExec) {
+    group = 'code generation'
+    description = 'Generates MyBatis models, mappers, and XML using generateConfig.xml.'
+    classpath = configurations.mybatisGenerator
+    mainClass = 'org.mybatis.generator.api.ShellRunner'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    workingDir = projectDir
+    args '-configfile', file('generateConfig.xml').absolutePath, '-overwrite', '-verbose'
+
+    doFirst {
+        file('src/main/java').mkdirs()
+        file('src/main/resources').mkdirs()
+    }
+}
